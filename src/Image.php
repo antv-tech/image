@@ -11,7 +11,12 @@ class Image {
 		$filename = $request->get( 'file' );
 		$width    = $request->get( 'w' );
 		$height   = $request->get( 'h' );
-		if ( $width || $height ) {
+
+		if (! $filename) {
+			return response('',404);
+		}
+
+		if ( $width ) {
 			$img = Img::make( $filename )
 			          ->fit( $width, $height, function ( $constraint ) {
 				          $constraint->upsize();
@@ -19,7 +24,6 @@ class Image {
 			          ->interlace();
 		} else {
 			$img = Img::make( $filename )->interlace();
-			$img->save();
 		}
 
 		return $img->response( 'jpg' );
