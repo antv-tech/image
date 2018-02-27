@@ -8,10 +8,22 @@ use Intervention\Image\Facades\Image as Img;
 use Intervention\Image\Response;
 
 class Image {
+
+	/**
+	 * Create image by file, width, height, and format
+	 *
+	 * @param Request $request
+	 * @param integer $w
+	 * @param integer $h
+	 * @param string $format
+	 *
+	 * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+	 */
 	public function make( Request $request ) {
 		$filename = $request->get( 'file' );
 		$width    = $request->get( 'w' );
 		$height   = $request->get( 'h' );
+		$format   = $request->get( 'format' ) ? $request->get( 'format' ) : 'jpg';
 
 		if ( ! $filename ) {
 			return response( '', 404 );
@@ -31,10 +43,22 @@ class Image {
 			}, 10, true );
 		}
 
-		return $img->response( 'jpg' );
+		return $img->response( $format );
 	}
 
+	/**
+	 * Create Placeholder image
+	 *
+	 * @param Request $request
+	 * @param integer $width
+	 * @param integer $height
+	 * @param string $format
+	 *
+	 * @return mixed
+	 */
 	public function placeholder( Request $request, $width, $height ) {
+		$format = $request->get( 'format' ) ? $request->get( 'format' ) : 'png';
+
 		$img = Img::cache( function ( $image ) use ( $width, $height ) {
 			return $image->make( __DIR__ . '/antv.png' )
 			             ->resizeCanvas( 400, 400, 'center', false )
@@ -45,6 +69,6 @@ class Image {
 			             ->greyscale();
 		}, 10, true );
 
-		return $img->response( 'png' );
+		return $img->response( $format );
 	}
 }
